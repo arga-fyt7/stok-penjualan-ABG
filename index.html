@@ -5,10 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aplikasi Stok Barang</title>
+    <meta name="description"
+        content="Aplikasi untuk mengelola stok barang dengan fitur shift karyawan, perhitungan penjualan, dan ekspor data.">
+    <meta name="theme-color" content="#4fc3f7">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📦</text></svg>">
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
     <style>
         :root {
+            /* Backgrounds */
             --bg-body: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
             --bg-container: #ffffff;
             --bg-header: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
@@ -20,13 +26,24 @@
             --bg-rekap: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
             --bg-modal: #ffffff;
             --bg-modal-header: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+
+            /* Text */
             --text-primary: #424242;
             --text-secondary: #757575;
             --text-white: #ffffff;
+
+            /* Border & Shadow */
             --border: #e0e0e0;
             --border-focus: #4fc3f7;
-            --shadow: rgba(0,0,0,0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
+
+            /* Overlay */
             --modal-overlay: rgba(0, 0, 0, 0.55);
+
+            /* Utility */
+            --radius: 10px;
+            --shadow-md: 0 6px 18px var(--shadow);
+            --shadow-sm: 0 3px 8px var(--shadow);
         }
 
         [data-theme="dark"] {
@@ -41,46 +58,49 @@
             --bg-rekap: linear-gradient(135deg, #2a4365 0%, #1a365d 100%);
             --bg-modal: #2d3748;
             --bg-modal-header: linear-gradient(135deg, #2b77e6 0%, #1e5f99 100%);
+
             --text-primary: #e2e8f0;
             --text-secondary: #a0aec0;
-            --text-white: #ffffff;
             --border: #4a5568;
             --border-focus: #63b3ed;
-            --shadow: rgba(0,0,0,0.3);
+            --shadow: rgba(0, 0, 0, 0.3);
             --modal-overlay: rgba(0, 0, 0, 0.7);
         }
 
+        /* Base */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-body);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             min-height: 100vh;
             color: var(--text-primary);
-            line-height: 1.5;
+            line-height: 1.4;
             transition: background 0.3s ease, color 0.3s ease;
         }
 
         .container {
             max-width: 1200px;
-            margin: 0 auto;
+            margin: 20px auto;
             background: var(--bg-container);
-            border-radius: 14px;
-            box-shadow: 0 8px 24px var(--shadow);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
             transition: background 0.3s ease;
         }
 
+        /* Header */
         h1 {
             text-align: center;
             margin: 0;
-            padding: 20px;
+            padding: 12px;
             background: var(--bg-header);
             color: var(--text-white);
-            font-size: 2em;
-            letter-spacing: 0.5px;
+            font-size: 1.4em;
+            letter-spacing: 0.3px;
         }
 
+        /* Date box */
         .date-box {
             text-align: center;
             padding: 20px;
@@ -89,52 +109,85 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 12px;
-            transition: background 0.3s ease;
+            gap: 15px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin: 10px 0;
+        }
+
+        /* Welcome Banner */
+        .welcome-banner {
+            text-align: center;
+            padding: 10px;
+            background: var(--bg-date-box);
+            border-radius: var(--radius);
+            margin: 8px 0;
+            border: 1px solid var(--border);
+        }
+
+        .welcome-banner h2 {
+            margin: 0;
+            font-size: 1.2em;
+            color: var(--text-primary);
         }
 
         .date-box label {
             font-size: 18px;
             font-weight: 600;
-            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        /* Responsive Date Box */
+        @media (max-width: 768px) {
+            .date-box {
+                flex-direction: column;
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .date-box label {
+                font-size: 16px;
+                margin-bottom: 0;
+            }
+
+            .date-box input {
+                padding: 12px 16px;
+                font-size: 16px;
+                max-width: none;
+            }
         }
 
         .date-box input {
             padding: 10px 14px;
             border: 2px solid var(--border-focus);
-            border-radius: 10px;
+            border-radius: var(--radius);
             font-size: 16px;
-            transition: all 0.3s ease;
             background: var(--bg-container);
             color: var(--text-primary);
+            transition: all 0.3s ease;
+            width: 100%;
+            max-width: 300px;
         }
 
         .date-box input:focus {
-            outline: none;
             border-color: var(--border-focus);
-            box-shadow: 0 0 6px rgba(79,195,247,0.4);
+            box-shadow: 0 0 6px rgba(79, 195, 247, 0.4);
         }
 
-        .actions {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 20px;
-            gap: 12px;
-        }
-
+        /* Buttons */
         .btn {
-            padding: 12px 20px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
+            font-size: 13px;
+            font-weight: 600;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 10px var(--shadow);
+            gap: 4px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            min-height: 38px;
         }
 
         .btn:hover {
@@ -142,38 +195,75 @@
             box-shadow: 0 6px 14px var(--shadow);
         }
 
-        .btn-blue { background: linear-gradient(135deg, #4fc3f7, #29b6f6); color: var(--text-white); }
-        .btn-green { background: linear-gradient(135deg, #66bb6a, #43a047); color: var(--text-white); }
-        .btn-orange { background: linear-gradient(135deg, #ffa726, #fb8c00); color: var(--text-white); }
-        .btn-purple { background: linear-gradient(135deg, #ab47bc, #8e24aa); color: var(--text-white); }
-        .btn-red { background: linear-gradient(135deg, #ef5350, #e53935); color: var(--text-white); }
-        .btn-theme { background: linear-gradient(135deg, #9c88ff, #6c5ce7); color: var(--text-white); }
+        /* Responsive Buttons */
+        @media (max-width: 768px) {
+            .btn {
+                padding: 8px 16px;
+                font-size: 13px;
+                min-height: 33px;
+                border-radius: 8px;
+            }
+        }
 
+        .btn-blue {
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            color: var(--text-white);
+        }
+
+        .btn-green {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: var(--text-white);
+        }
+
+        .btn-orange {
+            background: linear-gradient(135deg, #ffa726, #fb8c00);
+            color: var(--text-white);
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #ab47bc, #8e24aa);
+            color: var(--text-white);
+        }
+
+        .btn-red {
+            background: linear-gradient(135deg, #ef5350, #e53935);
+            color: var(--text-white);
+        }
+
+        .btn-theme {
+            background: linear-gradient(135deg, #9c88ff, #6c5ce7);
+            color: var(--text-white);
+        }
+
+        /* Table */
         .table-container {
             overflow-x: auto;
-            padding: 20px;
+            padding: 16px;
+            position: relative;
+            border-radius: var(--radius);
+            background: var(--bg-container);
+            box-shadow: var(--shadow-sm);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             background: var(--bg-table);
-            border-radius: 10px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 10px var(--shadow);
+            box-shadow: var(--shadow-md);
             font-size: 14px;
-            transition: background 0.3s ease;
+            min-width: 800px;
+            /* Ensure minimum width for horizontal scroll */
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid var(--border);
-            padding: 12px;
+            padding: 10px 8px;
             vertical-align: middle;
             text-align: center;
-        }
-
-        th:last-child, td:last-child {
-            min-width: 140px;
+            min-width: 60px;
         }
 
         th {
@@ -181,6 +271,9 @@
             color: var(--text-white);
             font-size: 15px;
             font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
         tbody tr:nth-child(even) {
@@ -189,24 +282,47 @@
 
         tbody tr:hover {
             background: var(--bg-hover-row);
+            transition: background 0.2s ease;
         }
 
+        /* Responsive Table */
+        @media (max-width: 768px) {
+            .table-container {
+                padding: 8px;
+            }
+
+            table {
+                font-size: 12px;
+                min-width: 600px;
+                /* Adjust for mobile */
+            }
+
+            th,
+            td {
+                padding: 6px 4px;
+                min-width: 50px;
+            }
+
+            th {
+                font-size: 13px;
+            }
+        }
+
+        /* Input umum */
         input {
             width: 100%;
-            padding: 8px;
+            padding: 4px;
             border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 13px;
+            border-radius: 4px;
+            font-size: 11px;
             text-align: center;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
             background: var(--bg-container);
             color: var(--text-primary);
         }
 
         input:focus {
-            outline: none;
             border-color: var(--border-focus);
-            box-shadow: 0 0 4px rgba(79,195,247,0.3);
+            box-shadow: 0 0 4px rgba(79, 195, 247, 0.3);
         }
 
         input[readonly] {
@@ -216,49 +332,15 @@
             color: var(--text-secondary);
         }
 
-        .delete-btn {
-            background: #ef5350;
-            color: var(--text-white);
-            border: none;
-            border-radius: 6px;
-            padding: 6px 10px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
-        }
-
-        .delete-btn:hover {
-            background: #e53935;
-        }
-
-        .check-btn {
-            background: #4caf50;
-            color: var(--text-white);
-            border: none;
-            border-radius: 6px;
-            padding: 4px 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px var(--shadow);
-            margin-right: 5px;
-        }
-
-        .check-btn:hover {
-            background: #45a049;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px var(--shadow);
-        }
-
+        /* Rekap */
         #rekap {
             background: var(--bg-rekap);
-            padding: 20px;
-            margin: 20px;
-            border-radius: 10px;
-            font-size: 15px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            font-size: 12px;
             border: 1px solid var(--border);
-            box-shadow: 0 4px 8px var(--shadow);
-            transition: background 0.3s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         #rekap h3 {
@@ -266,8 +348,31 @@
             color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1.2em;
+            gap: 8px;
+            font-size: 1.1em;
+        }
+
+        /* Scroll-to-top */
+        #scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #4fc3f7, #29b6f6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px var(--shadow);
+            display: none;
+            transition: all 0.3s ease;
+        }
+
+        #scroll-to-top:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px var(--shadow);
         }
 
         /* Modal Styles */
@@ -282,177 +387,382 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            animation: fadeIn 0.3s ease;
+            transition: opacity 0.3s ease;
         }
 
         .modal {
             background: var(--bg-modal);
-            border-radius: 14px;
-            box-shadow: 0 8px 32px var(--shadow);
-            max-width: 420px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-md);
+            max-width: 500px;
             width: 90%;
-            animation: slideUp 0.35s ease-out;
+            max-height: 80vh;
+            overflow-y: auto;
             transition: background 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(40px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
         .modal-header {
-            padding: 18px;
             background: var(--bg-modal-header);
             color: var(--text-white);
-            border-radius: 14px 14px 0 0;
-        }
-
-        .modal-header h3 {
-            margin: 0;
-            font-size: 1.3em;
+            padding: 15px 20px;
+            border-radius: var(--radius) var(--radius) 0 0;
+            font-size: 1.2em;
+            font-weight: 600;
         }
 
         .modal-body {
             padding: 20px;
-            font-size: 15px;
-            line-height: 1.6;
             color: var(--text-primary);
         }
 
         .modal-footer {
             padding: 15px 20px;
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            border-radius: 0 0 var(--radius) var(--radius);
         }
 
-        #loginBox {
-            text-align: center;
-            padding: 40px;
-            background: var(--bg-container);
-            border-radius: 14px;
-            box-shadow: 0 8px 24px var(--shadow);
-            margin-bottom: 20px;
+        /* Button Styles for Table Actions */
+        .check-btn,
+        .delete-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            margin: 2px;
+            min-width: 35px;
+            min-height: 35px;
         }
 
-        #loginBox label {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text-primary);
-            margin-bottom: 15px;
-            display: block;
+        .check-btn {
+            background: linear-gradient(135deg, #66bb6a, #43a047);
+            color: var(--text-white);
         }
 
-        #loginBox input {
-            padding: 12px 16px;
+        .check-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ef5350, #e53935);
+            color: var(--text-white);
+        }
+
+        .delete-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+
+        .delete-btn:disabled {
+            background: var(--bg-even-row);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* Responsive Buttons */
+        @media (max-width: 768px) {
+
+            .check-btn,
+            .delete-btn {
+                padding: 4px 6px;
+                font-size: 12px;
+                min-width: 28px;
+                min-height: 28px;
+                border-radius: 4px;
+            }
+        }
+
+        /* Select Styles */
+        select {
+            padding: 8px 12px;
             border: 2px solid var(--border-focus);
-            border-radius: 10px;
-            font-size: 18px;
-            text-align: center;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 300px;
+            border-radius: var(--radius);
+            font-size: 14px;
             background: var(--bg-container);
             color: var(--text-primary);
-            transition: border-color 0.3s ease;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
         }
 
-        #loginBox input:focus {
-            outline: none;
+        select:focus {
             border-color: var(--border-focus);
-            box-shadow: 0 0 6px rgba(79,195,247,0.4);
+            box-shadow: 0 0 6px rgba(79, 195, 247, 0.4);
         }
 
-        #loginBox .btn {
-            padding: 14px 24px;
+        select:hover {
+            box-shadow: 0 2px 8px var(--shadow);
+        }
+
+        /* Sortable Table Headers */
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            transition: background 0.3s ease;
+        }
+
+        th.sortable:hover {
+            background: var(--bg-th);
+        }
+
+        th.sortable.asc::after {
+            content: ' ↑';
+            font-weight: bold;
+        }
+
+        th.sortable.desc::after {
+            content: ' ↓';
+            font-weight: bold;
+        }
+
+        /* Bulk Actions */
+        .bulk-actions {
+            display: none;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: var(--bg-date-box);
+            border-radius: var(--radius);
+            margin: 10px 0;
+            border: 1px solid var(--border);
+        }
+
+        /* Hidden Class */
+        .hidden {
+            display: none !important;
+        }
+
+        /* Modal Input for Prompts */
+        .modal-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
             font-size: 16px;
+            background: var(--bg-container);
+            color: var(--text-primary);
+            margin-top: 10px;
         }
 
+        /* Simplified Actions Navigation */
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px;
+            background: var(--bg-date-box);
+            border-radius: var(--radius);
+            margin: 8px 0;
+            border: 1px solid var(--border);
+            justify-content: center;
+        }
+
+
+
+        /* Input Styling */
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            text-align: center;
+            background: var(--bg-container);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus {
+            border-color: var(--border-focus);
+            box-shadow: 0 0 6px rgba(79, 195, 247, 0.4);
+            outline: none;
+        }
+
+        input[readonly] {
+            background: var(--bg-even-row);
+            font-weight: bold;
+            cursor: not-allowed;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Input */
+        @media (max-width: 768px) {
+
+            input[type="number"],
+            input[type="text"] {
+                padding: 6px;
+                font-size: 12px;
+                border-radius: 4px;
+            }
+        }
+
+        /* Button Styling */
+        .btn {
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1.5px);
+            box-shadow: 0 5px 12px var(--shadow);
+        }
+
+        /* Responsive Checkbox Styling */
+        @media (max-width: 768px) {
+            input[type="checkbox"] {
+                width: 10px;
+                height: 10px;
+                transform: scale(1.5);
+                margin: 0;
+            }
+
+            .select-checkbox {
+                transform: scale(1.2);
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1><ion-icon name="stats-chart"></ion-icon> Aplikasi Penghitung Stok Barang</h1>
+        <header>
+            <h1><ion-icon name="stats-chart" aria-hidden="true"></ion-icon> Aplikasi Penghitung Stok Barang</h1>
+        </header>
 
-        <div id="loginBox" class="date-box">
-            <label for="karyawan1">Masukkan Nama Karyawan Shift 1:</label>
-            <input type="text" id="karyawan1" placeholder="Nama Karyawan Shift 1">
+        <section id="loginBox" class="date-box" role="region" aria-labelledby="loginLabel">
+            <label id="loginLabel" for="karyawan1">Masukkan Nama Karyawan Shift 1:</label>
+            <input type="text" id="karyawan1" placeholder="Nama Karyawan Shift 1" aria-describedby="loginLabel"
+                required>
             <input type="hidden" id="karyawan2" value="">
-            <button class="btn btn-blue" onclick="confirmShift1()">Konfirmasi</button>
-        </div>
+            <button class="btn btn-blue" onclick="confirmShift1()"
+                aria-label="Konfirmasi nama karyawan shift 1">Konfirmasi</button>
+        </section>
 
-        <div id="mainContent" style="display:none;">
-            <div class="date-box">
-                <label for="tanggal"><ion-icon name="calendar"></ion-icon> Pilih Tanggal:</label>
-                <input type="date" id="tanggal">
-            </div>
+        <main id="mainContent" class="hidden" role="main">
+            <section id="welcome-banner" class="welcome-banner hidden" role="region" aria-labelledby="welcomeLabel">
+                <h2 id="welcomeLabel">Selamat datang, <span id="welcomeUser">Karyawan</span></h2>
+            </section>
 
-            <div class="saved-dates" id="savedDatesContainer" style="display:none;">
-                <label for="savedDates">Lihat Data Tersimpan:</label>
-                <select id="savedDates" onchange="loadDataByDate(this.value)">
+            <section class="date-box" role="region" aria-labelledby="dateLabel">
+                <label id="dateLabel" for="tanggal"><ion-icon name="calendar" aria-hidden="true"></ion-icon> Pilih
+                    Tanggal:</label>
+                <input type="date" id="tanggal" aria-describedby="dateLabel" required>
+            </section>
+
+            <section class="saved-dates hidden" id="savedDatesContainer" role="region"
+                aria-labelledby="savedDatesLabel">
+                <label id="savedDatesLabel" for="savedDates">Lihat Data Tersimpan:</label>
+                <select id="savedDates" onchange="loadDataByDate(this.value)" aria-describedby="savedDatesLabel">
                     <option value="">-- Pilih Tanggal --</option>
                 </select>
+            </section>
+
+            <nav class="actions" role="navigation" aria-label="Aksi utama">
+                <button id="tambahBtn" class="btn btn-blue" onclick="tambahBarang()" aria-label="Tambah barang baru">
+                    <ion-icon name="add" aria-hidden="true"></ion-icon> Tambah Barang
+                </button>
+                <button id="simpanBtn" class="btn btn-green hidden" onclick="simpanData()"
+                    aria-label="Simpan data hari ini">
+                    <ion-icon name="save" aria-hidden="true"></ion-icon> Simpan Data Hari Ini
+                </button>
+                <button id="selesaiShift1Btn" class="btn btn-orange" onclick="selesaiShift1()"
+                    aria-label="Selesai shift 1">
+                    <ion-icon name="checkmark-circle" aria-hidden="true"></ion-icon> Selesai Shift 1
+                </button>
+                <button id="kembaliShift1Btn" class="btn btn-purple hidden" onclick="kembaliKeShift1()"
+                    aria-label="Kembali ke shift 1">
+                    <ion-icon name="arrow-back" aria-hidden="true"></ion-icon> Kembali ke Shift 1
+                </button>
+                <button id="mulaiBaruBtn" class="btn btn-purple hidden" onclick="mulaiHariBaru()"
+                    aria-label="Mulai hari baru">
+                    <ion-icon name="refresh" aria-hidden="true"></ion-icon> Mulai Hari Baru
+                </button>
+                <button id="exportBtn" class="btn btn-red" onclick="exportToCSV()" aria-label="Ekspor data ke CSV">
+                    <ion-icon name="download" aria-hidden="true"></ion-icon> Export CSV
+                </button>
+                <button id="historyBtn" class="btn btn-theme" onclick="showHistory()" aria-label="Lihat history data">
+                    <ion-icon name="time" aria-hidden="true"></ion-icon> History
+                </button>
+                <button class="btn btn-red" onclick="clearAllData()" aria-label="Hapus semua data">
+                    <ion-icon name="trash-bin" aria-hidden="true"></ion-icon> Hapus Semua Data
+                </button>
+                <select id="themeSelector" class="btn btn-theme" onchange="changeTheme(this.value)"
+                    aria-label="Pilih tema">
+                    <option value="system">Sistem</option>
+                    <option value="light">Terang</option>
+                    <option value="dark">Gelap</option>
+                </select>
+            </nav>
+
+            <section class="search-container" role="search" aria-labelledby="searchLabel">
+                <label id="searchLabel" class="hidden" for="searchInput">Cari Barang:</label>
+                <input type="text" id="searchInput" placeholder="Cari berdasarkan nama barang..."
+                    oninput="filterTable()" aria-describedby="searchLabel">
+            </section>
+
+            <section class="bulk-actions hidden" id="bulkActions" role="region" aria-labelledby="bulkLabel">
+                <span id="bulkLabel" class="hidden">Aksi Massal:</span>
+                <button class="btn btn-red" onclick="bulkDelete()" aria-label="Hapus barang yang dipilih">Hapus
+                    Terpilih</button>
+                <button class="btn btn-blue" onclick="selectAll()" aria-label="Pilih semua barang">Pilih Semua</button>
+            </section>
+
+            <div class="table-container" role="region" aria-labelledby="tableLabel">
+                <table id="stokTable" aria-describedby="tableLabel">
+                    <caption id="tableLabel" class="hidden">Tabel Stok Barang</caption>
+                    <thead>
+                        <tr>
+                            <th rowspan="2"><input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll()"
+                                    aria-label="Pilih semua barang"></th>
+                            <th rowspan="2" class="sortable" onclick="sortTable(1)">Nama Barang</th>
+                            <th rowspan="2" class="sortable" onclick="sortTable(2)">Satuan</th>
+                            <th rowspan="2" class="sortable" onclick="sortTable(3)">Stok Awal</th>
+                            <th colspan="2">Shift 1</th>
+                            <th colspan="2">Shift 2</th>
+                            <th colspan="2">Terjual</th>
+                            <th rowspan="2" class="sortable" onclick="sortTable(10)">Total Penjualan</th>
+                            <th rowspan="2">Keterangan</th>
+                            <th rowspan="2">Aksi</th>
+                        </tr>
+                        <tr>
+                            <th class="sortable" onclick="sortTable(4)">Tambahan Gudang</th>
+                            <th class="sortable" onclick="sortTable(5)">Sisa</th>
+                            <th class="sortable" onclick="sortTable(6)">Tambahan Gudang</th>
+                            <th class="sortable" onclick="sortTable(7)">Sisa (Akhir)</th>
+                            <th class="sortable" onclick="sortTable(8)">Shift 1</th>
+                            <th class="sortable" onclick="sortTable(9)">Shift 2</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
 
-            <div id="currentEmployee" class="date-box" style="background: var(--bg-header); color: var(--text-white);">
-                <span id="employeeDisplay">Karyawan Aktif: Shift 1 - <span id="activeName"></span></span>
-            </div>
+            <section id="rekap" role="region" aria-labelledby="rekapLabel" aria-live="polite">
+                <h3 id="rekapLabel"><ion-icon name="bar-chart" aria-hidden="true"></ion-icon> Rekap Penjualan</h3>
+                <p id="rekapText">Belum ada data.</p>
+            </section>
+        </main>
 
-        <div class="actions">
-            <button class="btn btn-blue" onclick="tambahBarang()">
-                <ion-icon name="add"></ion-icon> Tambah Barang
-            </button>
-            <button class="btn btn-green" onclick="simpanData()">
-                <ion-icon name="save"></ion-icon> Simpan Data Hari Ini
-            </button>
-            <button class="btn btn-orange" onclick="selesaiShift1()">
-                <ion-icon name="checkmark-circle"></ion-icon> Selesai Shift 1
-            </button>
-            <button class="btn btn-purple" onclick="mulaiHariBaru()">
-                <ion-icon name="refresh"></ion-icon> Mulai Hari Baru
-            </button>
-            <button class="btn btn-red" onclick="exportToCSV()">
-                <ion-icon name="download"></ion-icon> Export CSV
-            </button>
-            <select id="themeSelector" class="btn btn-theme" onchange="changeTheme(this.value)">
-                <option value="system">Sistem</option>
-                <option value="light">Terang</option>
-                <option value="dark">Gelap</option>
-            </select>
-        </div>
-
-        <div class="table-container">
-            <table id="stokTable">
-                <thead>
-                    <tr>
-                        <th>Nama Barang</th>
-                        <th>Satuan</th>
-                        <th>Stok Awal</th>
-                        <th>Tambahan Gudang</th>
-                        <th>Sisa Shift 1</th>
-                        <th>Sisa Shift 2 (Akhir)</th>
-                        <th>Terjual Shift 1</th>
-                        <th>Terjual Shift 2</th>
-                        <th>Total Penjualan</th>
-                        <th>Keterangan</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <div id="rekap">
-            <h3><ion-icon name="bar-chart"></ion-icon> Rekap Penjualan</h3>
-            <p id="rekapText">Belum ada data.</p>
-        </div>
-        </div>
+        <!-- Scroll to Top Button -->
+        <button id="scroll-to-top" onclick="scrollToTop()">↑</button>
     </div>
 
     <!-- Modal Dialog -->
@@ -467,6 +777,20 @@
             <div class="modal-footer">
                 <button id="modal-ok" class="btn btn-blue">OK</button>
                 <button id="modal-cancel" class="btn btn-red" style="display:none;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal-overlay" class="modal-overlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>History Data</h3>
+            </div>
+            <div class="modal-body" id="historyContent">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-blue" onclick="closeHistory()">Tutup</button>
             </div>
         </div>
     </div>
@@ -487,6 +811,7 @@
 
                 const closeModal = () => {
                     overlay.style.display = 'none';
+                    overlay.removeEventListener('keydown', handleKeydown);
                     resolve();
                 };
 
@@ -518,6 +843,7 @@
 
                 const closeModal = (result) => {
                     overlay.style.display = 'none';
+                    overlay.removeEventListener('keydown', handleKeydown);
                     resolve(result);
                 };
 
@@ -543,8 +869,8 @@
         // Set default tanggal hari ini and load saved dates
         window.onload = function () {
             // Show login box initially
-            document.getElementById('loginBox').style.display = 'block';
-            document.getElementById('mainContent').style.display = 'none';
+            document.getElementById('loginBox').classList.remove('hidden');
+            document.getElementById('mainContent').classList.add('hidden');
 
             // Load saved theme or detect system preference
             let savedTheme = localStorage.getItem('theme') || 'system';
@@ -570,7 +896,7 @@
         }
 
         // Warn on page refresh if data not saved
-        window.onbeforeunload = function() {
+        window.onbeforeunload = function () {
             let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
             if (rows.length > 0) {
                 return "Data belum disimpan. Yakin ingin meninggalkan halaman?";
@@ -583,8 +909,12 @@
                 showAlert('Masukkan nama karyawan Shift 1 terlebih dahulu.');
                 return;
             }
-            document.getElementById('loginBox').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+
+            // Show welcome banner with name
+            document.getElementById('welcomeUser').textContent = name;
+            document.getElementById('welcome-banner').classList.remove('hidden');
 
             currentShift = 1;
 
@@ -594,7 +924,7 @@
             loadSavedDates();
             loadDataByDate(today);
 
-            updateActiveEmployee(1, name);
+            updateButtons();
         }
 
         function changeTheme(selectedTheme) {
@@ -614,9 +944,24 @@
             selector.value = theme;
         }
 
-        function updateActiveEmployee(shift, name) {
-            const display = document.getElementById('employeeDisplay');
-            display.innerHTML = `Karyawan Aktif: Shift ${shift} - <span id="activeName">${name}</span>`;
+        function updateButtons() {
+            if (currentShift === 1) {
+                document.getElementById('simpanBtn').classList.add('hidden');
+                document.getElementById('mulaiBaruBtn').classList.add('hidden');
+                document.getElementById('kembaliShift1Btn').classList.add('hidden');
+                document.getElementById('selesaiShift1Btn').classList.remove('hidden');
+                document.getElementById('selesaiShift1Btn').innerHTML = '<ion-icon name="checkmark-circle"></ion-icon> Selesai Shift 1';
+                document.getElementById('selesaiShift1Btn').className = 'btn btn-orange';
+                document.getElementById('selesaiShift1Btn').onclick = selesaiShift1;
+            } else {
+                document.getElementById('simpanBtn').classList.add('hidden');
+                document.getElementById('mulaiBaruBtn').classList.remove('hidden');
+                document.getElementById('kembaliShift1Btn').classList.remove('hidden');
+                document.getElementById('selesaiShift1Btn').classList.remove('hidden');
+                document.getElementById('selesaiShift1Btn').innerHTML = '<ion-icon name="save"></ion-icon> Simpan Data Hari Ini';
+                document.getElementById('selesaiShift1Btn').className = 'btn btn-green';
+                document.getElementById('selesaiShift1Btn').onclick = simpanData;
+            }
         }
 
         async function selesaiShift1() {
@@ -624,8 +969,8 @@
             if (karyawan2) {
                 await showAlert("Shift 1 sudah selesai. Karyawan Shift 2: " + karyawan2);
                 currentShift = 2;
-                updateActiveEmployee(2, karyawan2);
                 updateTableReadOnly();
+                updateButtons();
                 return;
             }
 
@@ -633,17 +978,27 @@
             const name = await showPrompt("Masukkan nama karyawan Shift 2:");
             if (name && name.trim()) {
                 document.getElementById("karyawan2").value = name.trim();
+                // Update welcome banner with Shift 2 name
+                document.getElementById('welcomeUser').textContent = name.trim();
                 await showAlert("Shift 1 selesai. Selamat datang, " + name.trim() + " untuk Shift 2!");
                 currentShift = 2;
-                updateActiveEmployee(2, name.trim());
                 updateTableReadOnly();
+                updateButtons();
             }
+        }
+
+        async function kembaliKeShift1() {
+            if (!(await showConfirm("Apakah Anda yakin ingin kembali ke Shift 1? Data Shift 2 akan tetap tersimpan."))) return;
+            currentShift = 1;
+            updateTableReadOnly();
+            updateButtons();
+            await showAlert("Kembali ke Shift 1. Anda dapat mengedit data Shift 1.");
         }
 
         function showPrompt(message) {
             return new Promise((resolve) => {
                 document.getElementById('modal-title').textContent = 'Input';
-                document.getElementById('modal-message').innerHTML = message + '<br><input type="text" id="prompt-input" style="width:100%; margin-top:10px; padding:8px;">';
+                document.getElementById('modal-message').innerHTML = message + '<br><input type="text" id="prompt-input" class="modal-input">';
                 document.getElementById('modal-cancel').style.display = 'inline-block';
                 document.getElementById('modal-overlay').style.display = 'flex';
 
@@ -654,6 +1009,7 @@
 
                 const closeModal = (result) => {
                     overlay.style.display = 'none';
+                    overlay.removeEventListener('keydown', handleKeydown);
                     document.getElementById('modal-message').innerHTML = '';
                     resolve(result);
                 };
@@ -694,9 +1050,10 @@
             if (savedDates.length > 0) {
                 document.getElementById("savedDatesContainer").style.display = "block";
                 savedDates.forEach(date => {
+                    let data = JSON.parse(localStorage.getItem("stokData_" + date));
                     let option = document.createElement("option");
                     option.value = date;
-                    option.textContent = date;
+                    option.textContent = date + " - Shift1: " + (data.karyawan1 || 'N/A') + " | Shift2: " + (data.karyawan2 || 'N/A');
                     select.appendChild(option);
                 });
             } else {
@@ -708,6 +1065,10 @@
         async function loadDataByDate(date) {
             if (!date) {
                 clearTable();
+                // Reset UI elements
+                document.getElementById("searchInput").value = "";
+                document.getElementById("selectAllCheckbox").checked = false;
+                updateBulkActions();
                 return;
             }
             let key = "stokData_" + date;
@@ -719,17 +1080,24 @@
                 document.getElementById("tanggal").value = date;
                 document.getElementById("karyawan1").value = data.karyawan1 || "";
                 document.getElementById("karyawan2").value = data.karyawan2 || "";
-                // Update active employee display and shift
+                // Reset UI elements
+                document.getElementById("searchInput").value = "";
+                document.getElementById("selectAllCheckbox").checked = false;
+                updateBulkActions();
+                // Update shift
                 if (data.karyawan2) {
                     currentShift = 2;
-                    updateActiveEmployee(2, data.karyawan2);
                 } else if (data.karyawan1) {
                     currentShift = 1;
-                    updateActiveEmployee(1, data.karyawan1);
                 }
                 updateTableReadOnly();
+                updateButtons();
             } else {
                 clearTable();
+                // Reset UI elements
+                document.getElementById("searchInput").value = "";
+                document.getElementById("selectAllCheckbox").checked = false;
+                updateBulkActions();
                 await showAlert("Tidak ada data untuk tanggal " + date);
             }
         }
@@ -745,19 +1113,21 @@
             let row = table.insertRow();
 
             row.innerHTML = `
+        <td><input type="checkbox" class="select-checkbox" onchange="updateBulkActions()"></td>
         <td><input type="text" value="${barang.nama || ""}" placeholder="Nama Barang" ${currentShift !== 1 ? 'readonly' : ''}></td>
         <td><input type="text" value="${barang.satuan || ""}" placeholder="Satuan" ${currentShift !== 1 ? 'readonly' : ''}></td>
         <td><input type="number" value="${barang.stokAwal || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 1 ? 'readonly' : ''}></td>
         <td><input type="number" value="${barang.gudang || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 1 ? 'readonly' : ''}></td>
         <td><input type="number" value="${barang.sisa1 || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 1 ? 'readonly' : ''}></td>
+        <td><input type="number" value="${barang.gudang2 || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 2 ? 'readonly' : ''}></td>
         <td><input type="number" value="${barang.sisa2 || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 2 ? 'readonly' : ''}></td>
         <td><input type="text" value="${barang.jual1 || 0}" readonly></td>
         <td><input type="text" value="${barang.jual2 || 0}" readonly></td>
         <td><input type="text" value="${barang.total || 0}" readonly></td>
         <td><input type="text" value="${barang.ket || ""}" placeholder="Keterangan"></td>
-        <td>
+        <td style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
             <button class="check-btn" onclick="simpanBarang(this)" title="Simpan Barang"><ion-icon name="checkmark"></ion-icon></button>
-            <button class="delete-btn" onclick="hapusBarang(this)" ${currentShift !== 1 ? 'disabled' : ''}><ion-icon name="trash"></ion-icon></button>
+            <button class="delete-btn" onclick="hapusBarang(this)"><ion-icon name="trash"></ion-icon></button>
         </td>
       `;
 
@@ -767,38 +1137,50 @@
         function updateTableReadOnly() {
             let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
             for (let i = 0; i < rows.length; i++) {
-                rows[i].cells[0].children[0].readOnly = currentShift !== 1; // nama
-                rows[i].cells[1].children[0].readOnly = currentShift !== 1; // satuan
-                rows[i].cells[2].children[0].readOnly = currentShift !== 1; // stokAwal
-                rows[i].cells[3].children[0].readOnly = currentShift !== 1; // gudang
-                rows[i].cells[4].children[0].readOnly = currentShift !== 1; // sisa1
-                rows[i].cells[5].children[0].readOnly = currentShift !== 2; // sisa2
-                rows[i].cells[10].children[0].disabled = currentShift !== 1; // delete button
+                rows[i].cells[1].children[0].readOnly = currentShift !== 1; // nama
+                rows[i].cells[2].children[0].readOnly = currentShift !== 1; // satuan
+                rows[i].cells[3].children[0].readOnly = currentShift !== 1; // stokAwal
+                rows[i].cells[4].children[0].readOnly = currentShift !== 1; // gudang
+                rows[i].cells[5].children[0].readOnly = currentShift !== 1; // sisa1
+                rows[i].cells[6].children[0].readOnly = currentShift !== 2; // gudang2
+                rows[i].cells[7].children[0].readOnly = currentShift !== 2; // sisa2
             }
         }
 
         function hitungSemua() {
             let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
-            let totalShift1 = 0, totalShift2 = 0, totalPenjualan = 0;
+            let totalShift1 = 0, totalShift2 = 0, totalPenjualan = 0, totalStokAkhir = 0, totalStokDipakai = 0;
 
             for (let i = 0; i < rows.length; i++) {
-                let stokAwal = parseInt(rows[i].cells[2].children[0].value) || 0;
-                let gudang = parseInt(rows[i].cells[3].children[0].value) || 0;
-                let sisa1 = parseInt(rows[i].cells[4].children[0].value) || 0;
-                let sisa2 = parseInt(rows[i].cells[5].children[0].value) || 0;
+                // Get input values
+                let stokAwal = parseInt(rows[i].cells[3].children[0].value, 10) || 0;
+                let gudang = parseInt(rows[i].cells[4].children[0].value, 10) || 0; // Addition for Shift 1
+                let sisa1 = parseInt(rows[i].cells[5].children[0].value, 10) || 0; // Remaining after Shift 1
+                let gudang2 = parseInt(rows[i].cells[6].children[0].value, 10) || 0; // Addition for Shift 2
+                let sisa2 = parseInt(rows[i].cells[7].children[0].value, 10) || 0; // Remaining after Shift 2
 
-                let totalStok = stokAwal + gudang;
-                let jual1 = Math.max(0, totalStok - sisa1);
-                let jual2 = Math.max(0, sisa1 - sisa2);
+                // Calculate total stock available for Shift 1
+                let totalStokShift1 = stokAwal + gudang;
+                // Sold in Shift 1 = total available - remaining
+                let jual1 = Math.max(0, totalStokShift1 - sisa1);
+
+                // Sold in Shift 2 = (remaining from Shift 1 + addition for Shift 2) - remaining after Shift 2
+                let jual2 = currentShift === 1 ? 0 : Math.max(0, sisa1 + gudang2 - sisa2);
+
+                // Total sold for this item
                 let total = jual1 + jual2;
 
-                rows[i].cells[6].children[0].value = jual1;
-                rows[i].cells[7].children[0].value = jual2;
-                rows[i].cells[8].children[0].value = total;
+                // Update the table cells
+                rows[i].cells[8].children[0].value = jual1;
+                rows[i].cells[9].children[0].value = jual2;
+                rows[i].cells[10].children[0].value = total;
 
+                // Accumulate totals
                 totalShift1 += jual1;
                 totalShift2 += jual2;
                 totalPenjualan += total;
+                totalStokAkhir += currentShift === 1 ? sisa1 : sisa2;
+                totalStokDipakai += stokAwal + gudang + gudang2;
             }
 
             let karyawan1 = document.getElementById("karyawan1").value || "Tidak ada";
@@ -808,7 +1190,9 @@
         <ion-icon name="time"></ion-icon> Terjual Shift 1: <b>${totalShift1}</b><br>
         <ion-icon name="person"></ion-icon> Karyawan Shift 2: <b>${karyawan2}</b><br>
         <ion-icon name="time"></ion-icon> Terjual Shift 2: <b>${totalShift2}</b><br>
-        <ion-icon name="basket"></ion-icon> Total Penjualan: <b>${totalPenjualan}</b>
+        <ion-icon name="basket"></ion-icon> Total Penjualan: <b>${totalPenjualan}</b><br>
+        <ion-icon name="archive"></ion-icon> Total Stok Dipakai: <b>${totalStokDipakai}</b><br>
+        <ion-icon name="archive"></ion-icon> Total Stok Akhir: <b>${totalStokAkhir}</b>
       `;
         }
 
@@ -845,16 +1229,17 @@
 
             for (let i = 0; i < rows.length; i++) {
                 data.items.push({
-                    nama: rows[i].cells[0].children[0].value,
-                    satuan: rows[i].cells[1].children[0].value,
-                    stokAwal: rows[i].cells[2].children[0].value,
-                    gudang: rows[i].cells[3].children[0].value,
-                    sisa1: rows[i].cells[4].children[0].value,
-                    sisa2: rows[i].cells[5].children[0].value,
-                    jual1: rows[i].cells[6].children[0].value,
-                    jual2: rows[i].cells[7].children[0].value,
-                    total: rows[i].cells[8].children[0].value,
-                    ket: rows[i].cells[9].children[0].value
+                    nama: rows[i].cells[1].children[0].value,
+                    satuan: rows[i].cells[2].children[0].value,
+                    stokAwal: rows[i].cells[3].children[0].value,
+                    gudang: rows[i].cells[4].children[0].value,
+                    gudang2: rows[i].cells[6].children[0].value,
+                    sisa1: rows[i].cells[5].children[0].value,
+                    sisa2: rows[i].cells[7].children[0].value,
+                    jual1: rows[i].cells[8].children[0].value,
+                    jual2: rows[i].cells[9].children[0].value,
+                    total: rows[i].cells[10].children[0].value,
+                    ket: rows[i].cells[11].children[0].value
                 });
             }
             localStorage.setItem("stokData_" + data.tanggal, JSON.stringify(data));
@@ -888,17 +1273,16 @@
             if (!(await showConfirm("Apakah Anda yakin ingin memulai hari baru? Data hari ini akan disimpan dan stok awal akan diperbarui."))) return;
 
             let data = JSON.parse(localStorage.getItem(lastDateKey));
-            let today = new Date(data.tanggal);
-            today.setDate(today.getDate() + 1);
-            let besok = today.toISOString().split("T")[0];
+            let besok = new Date().toISOString().split("T")[0];
 
             let dataBaru = data.items.map(item => ({
                 nama: item.nama,
                 satuan: item.satuan,
                 stokAwal: item.sisa2,  // stok akhir kemarin jadi stok awal
                 gudang: 0,
-                sisa1: 0,
-                sisa2: 0,
+                gudang2: 0,
+                sisa1: item.sisa2,     // set sisa1 to stokAwal so jual1 = 0
+                sisa2: item.sisa2,     // set sisa2 to stokAwal so jual2 = 0
                 jual1: 0,
                 jual2: 0,
                 total: 0,
@@ -908,13 +1292,18 @@
             document.getElementById("stokTable").getElementsByTagName("tbody")[0].innerHTML = "";
             muatData(dataBaru);
             document.getElementById("tanggal").value = besok;
-            document.getElementById("karyawan1").value = "";
             document.getElementById("karyawan2").value = "";
 
             currentShift = 1;
             // Reset to shift 1 for new day
-            updateActiveEmployee(1, "");
+            let newKaryawan1 = await showPrompt("Masukkan nama karyawan Shift 1 untuk hari baru:");
+            if (newKaryawan1 && newKaryawan1.trim()) {
+                document.getElementById("karyawan1").value = newKaryawan1.trim();
+            } else {
+                document.getElementById("karyawan1").value = "";
+            }
             updateTableReadOnly();
+            updateButtons();
 
             await showAlert("🔄 Hari baru dimulai untuk tanggal " + besok);
         }
@@ -935,11 +1324,11 @@
             }
 
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Nama Barang,Satuan,Stok Awal,Tambahan Gudang,Sisa Shift 1,Sisa Shift 2 (Akhir),Terjual Shift 1,Terjual Shift 2,Total Penjualan,Keterangan\n";
+            csvContent += "Nama Barang,Satuan,Stok Awal,Tambahan Gudang Shift 1,Sisa Shift 1,Tambahan Gudang Shift 2,Sisa Shift 2 (Akhir),Terjual Shift 1,Terjual Shift 2,Total Penjualan,Keterangan\n";
 
             for (let i = 0; i < rows.length; i++) {
                 let row = [];
-                for (let j = 0; j < 10; j++) { // 10 columns without delete button
+                for (let j = 1; j < 12; j++) { // 11 columns from nama to ket
                     let val = rows[i].cells[j].children[0].value;
                     // Escape quotes and commas
                     val = val.replace(/"/g, '""');
@@ -959,6 +1348,155 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        }
+
+        function showHistory() {
+            let content = '<ul style="list-style: none; padding: 0; max-height: 300px; overflow-y: auto;">';
+            let dates = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith("stokData_")) {
+                    dates.push(key.substring(9));
+                }
+            }
+            dates.sort().reverse(); // newest first
+            if (dates.length === 0) {
+                content = '<p>Tidak ada data history.</p>';
+            } else {
+                dates.forEach(date => {
+                    let data = JSON.parse(localStorage.getItem("stokData_" + date));
+                    let total = data.items.reduce((sum, item) => sum + parseInt(item.total || 0, 10), 0);
+                    content += `<li style="margin-bottom: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-container); box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+                        <strong>${date}</strong><br>
+                        Shift 1: ${data.karyawan1 || 'N/A'} | Shift 2: ${data.karyawan2 || 'N/A'}<br>
+                        Total Penjualan: ${total}
+                    </li>`;
+                });
+                content += '</ul>';
+            }
+            document.getElementById('historyContent').innerHTML = content;
+            document.getElementById('history-modal-overlay').style.display = 'flex';
+        }
+
+        function closeHistory() {
+            document.getElementById('history-modal-overlay').style.display = 'none';
+        }
+
+        async function clearAllData() {
+            if (!(await showConfirm("Apakah Anda yakin ingin menghapus semua data yang tersimpan? Tindakan ini tidak dapat dibatalkan."))) return;
+
+            localStorage.clear();
+            clearTable();
+            loadSavedDates();
+            document.getElementById("searchInput").value = "";
+            document.getElementById("selectAllCheckbox").checked = false;
+            updateBulkActions();
+            // Reset karyawan names and rekap
+            document.getElementById("karyawan1").value = "";
+            document.getElementById("karyawan2").value = "";
+            document.getElementById("rekapText").innerHTML = "Belum ada data.";
+            await showAlert("✅ Semua data telah dihapus.");
+        }
+
+        // Sorting variables
+        let sortColumn = -1;
+        let sortDirection = 'asc';
+
+        function sortTable(col) {
+            let table = document.getElementById("stokTable").getElementsByTagName("tbody")[0];
+            let rows = Array.from(table.rows);
+
+            if (sortColumn === col) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = col;
+                sortDirection = 'asc';
+            }
+
+            rows.sort((a, b) => {
+                let aVal = a.cells[col].children[0].value.toLowerCase();
+                let bVal = b.cells[col].children[0].value.toLowerCase();
+
+                if (!isNaN(aVal) && !isNaN(bVal)) {
+                    aVal = parseFloat(aVal);
+                    bVal = parseFloat(bVal);
+                }
+
+                if (sortDirection === 'asc') {
+                    return aVal > bVal ? 1 : -1;
+                } else {
+                    return aVal < bVal ? 1 : -1;
+                }
+            });
+
+            rows.forEach(row => table.appendChild(row));
+
+            // Update sort indicators
+            let ths = document.querySelectorAll("#stokTable th.sortable");
+            ths.forEach(th => th.classList.remove('asc', 'desc'));
+            ths[col - 1].classList.add(sortDirection); // col starts from 1, ths from 0
+        }
+
+        function filterTable() {
+            const search = document.getElementById("searchInput").value.toLowerCase();
+            const rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
+
+            for (let i = 0; i < rows.length; i++) {
+                const nama = rows[i].cells[1].children[0].value.toLowerCase(); // nama is cells[1]
+                if (nama.includes(search)) {
+                    rows[i].style.display = "";
+                } else {
+                    rows[i].style.display = "none";
+                }
+            }
+            updateBulkActions();
+        }
+
+        function toggleSelectAll() {
+            let masterCheckbox = document.getElementById("selectAllCheckbox");
+            let checkboxes = document.querySelectorAll("#stokTable tbody input[type='checkbox']");
+            checkboxes.forEach(cb => cb.checked = masterCheckbox.checked);
+            updateBulkActions();
+        }
+
+        function selectAll() {
+            let checkboxes = document.querySelectorAll("#stokTable tbody input[type='checkbox']");
+            checkboxes.forEach(cb => cb.checked = true);
+            updateBulkActions();
+        }
+
+        function updateBulkActions() {
+            let checkboxes = document.querySelectorAll("#stokTable tbody input[type='checkbox']");
+            let checked = Array.from(checkboxes).some(cb => cb.checked);
+            document.getElementById("bulkActions").style.display = checked ? "flex" : "none";
+        }
+
+        async function bulkDelete() {
+            let checkboxes = document.querySelectorAll("#stokTable tbody input[type='checkbox']:checked");
+            if (checkboxes.length === 0) return;
+
+            if (!(await showConfirm(`Apakah Anda yakin ingin menghapus ${checkboxes.length} barang yang dipilih?`))) return;
+
+            checkboxes.forEach(cb => {
+                let row = cb.closest('tr');
+                row.parentNode.removeChild(row);
+            });
+            hitungSemua();
+            updateBulkActions();
+        }
+
+        // Scroll to Top Functionality
+        window.addEventListener('scroll', function () {
+            let scrollButton = document.getElementById('scroll-to-top');
+            if (window.pageYOffset > 100) {
+                scrollButton.style.display = 'block';
+            } else {
+                scrollButton.style.display = 'none';
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
