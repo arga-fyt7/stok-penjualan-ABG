@@ -694,8 +694,8 @@
                     aria-label="Mulai hari baru">
                     <ion-icon name="refresh" aria-hidden="true"></ion-icon> Mulai Hari Baru
                 </button>
-                <button id="exportBtn" class="btn btn-red" onclick="exportToCSV()" aria-label="Ekspor data ke CSV">
-                    <ion-icon name="download" aria-hidden="true"></ion-icon> Export CSV
+                <button id="exportBtn" class="btn btn-red" onclick="printReceipt()" aria-label="Cetak struk">
+                    <ion-icon name="print" aria-hidden="true"></ion-icon> Cetak Struk
                 </button>
                 <button id="historyBtn" class="btn btn-theme" onclick="showHistory()" aria-label="Lihat history data">
                     <ion-icon name="time" aria-hidden="true"></ion-icon> History
@@ -1317,38 +1317,85 @@
             hitungSemua();
         }
 
-        async function exportToCSV() {
+        async function printReceipt() {
             let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
             if (rows.length === 0) {
-                await showAlert("Tidak ada data untuk diekspor.");
+                await showAlert("Tidak ada data untuk dicetak.");
                 return;
             }
 
-            let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Nama Barang,Satuan,Stok Awal,Tambahan Gudang Shift 1,Sisa Shift 1,Tambahan Gudang Shift 2,Sisa Shift 2 (Akhir),Terjual Shift 1,Terjual Shift 2,Total Penjualan,Keterangan\n";
+            // Prepare receipt content
+            let tanggal = document.getElementById("tanggal").value || "Tanggal tidak tersedia";
+            let karyawan1 = document.getElementById("karyawan1").value || "Tidak ada";
+            let karyawan2 = document.getElementById("karyawan2").value || "Tidak ada";
 
+            // Calculate totals
+            let totalShift1 = 0, totalShift2 = 0, totalPenjualan = 0;
             for (let i = 0; i < rows.length; i++) {
-                let row = [];
-                for (let j = 1; j < 12; j++) { // 11 columns from nama to ket
-                    let val = rows[i].cells[j].children[0].value;
-                    // Escape quotes and commas
-                    val = val.replace(/"/g, '""');
-                    if (val.indexOf(",") >= 0 || val.indexOf('"') >= 0) {
-                        val = `"${val}"`;
-                    }
-                    row.push(val);
-                }
-                csvContent += row.join(",") + "\n";
+                totalShift1 += parseInt(rows[i].cells[8].children[0].value) || 0;
+                totalShift2 += parseInt(rows[i].cells[9].children[0].value) || 0;
+                totalPenjualan += parseInt(rows[i].cells[10].children[0].value) || 0;
             }
 
-            let encodedUri = encodeURI(csvContent);
-            let link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            let tanggal = document.getElementById("tanggal").value || "data";
-            link.setAttribute("download", `stok_barang_${tanggal}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            let itemsList = '';
+            for (let i = 0; i < rows.length; i++) {
+                let nama = rows[i].cells[1].children[0].value;
+                let total = rows[i].cells[10].children[0].value;
+                itemsList += `<p>${nama}: ${total}</p>`;
+            }
+
+            let receiptContent = `
+                <div style="font-family: monospace; width: 280px; padding: 10px;">
+                    <h3 style="text-align:center; margin-bottom: 10px;">Struk Penjualan</h3>
+                    <p>Tanggal: ${tanggal}</p>
+                    <p>Karyawan Shift 1: ${karyawan1}</p>
+                    <p>Karyawan Shift 2: ${karyawan2}</p>
+                    <hr>
+                    <p><strong>Daftar Barang:</strong></p>
+                    ${itemsList}
+                    <hr>
+                    <p>Terjual Shift 1: ${totalShift1}</p>
+                    <p>Terjual Shift 2: ${totalShift2}</p>
+                    <p><strong>Total Penjualan: ${totalPenjualan}</strong></p>
+                    <hr>
+                    <p>Terima kasih atas kerja keras Anda!</p>
+                </div>
+            `;
+
+            // Open new window for printing
+            let printWindow = window.open('', '', 'width=320,height=480');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Struk Penjualan</title>
+                    <style>
+                        @media print {
+                            body {
+                                width: 280px;
+                                margin: 0 auto;
+                                font-family: monospace;
+                                font-size: 12px;
+                            }
+                            h3 {
+                                text-align: center;
+                                margin-bottom: 10px;
+                            }
+                            hr {
+                                border: 1px dashed #000;
+                                margin: 10px 0;
+                            }
+                            p {
+                                margin: 4px 0;
+                            }
+                        }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    ${receiptContent}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
         }
 
         function showHistory() {
