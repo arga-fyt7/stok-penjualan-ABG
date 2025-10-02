@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Stok Barang</title>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <style>
+        :root {
+            --bg-body: linear-gradient(135deg, #e0f2fe 0%, #b3e5fc 100%);
+            --bg-container: #ffffff;
+            --bg-header: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            --bg-date-box: #f5f5f5;
+            --bg-table: #ffffff;
+            --bg-th: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            --bg-even-row: #fafafa;
+            --bg-hover-row: #e3f2fd;
+            --bg-rekap: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+            --bg-modal: #ffffff;
+            --bg-modal-header: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+            --text-primary: #424242;
+            --text-secondary: #757575;
+            --text-white: #ffffff;
+            --border: #e0e0e0;
+            --border-focus: #4fc3f7;
+            --shadow: rgba(0,0,0,0.1);
+            --modal-overlay: rgba(0, 0, 0, 0.55);
+        }
+
+        [data-theme="dark"] {
+            --bg-body: linear-gradient(135deg, #1e3a5f 0%, #0d2538 100%);
+            --bg-container: #2d3748;
+            --bg-header: linear-gradient(135deg, #2b77e6 0%, #1e5f99 100%);
+            --bg-date-box: #4a5568;
+            --bg-table: #2d3748;
+            --bg-th: linear-gradient(135deg, #2b77e6 0%, #1e5f99 100%);
+            --bg-even-row: #4a5568;
+            --bg-hover-row: #2c5282;
+            --bg-rekap: linear-gradient(135deg, #2a4365 0%, #1a365d 100%);
+            --bg-modal: #2d3748;
+            --bg-modal-header: linear-gradient(135deg, #2b77e6 0%, #1e5f99 100%);
+            --text-primary: #e2e8f0;
+            --text-secondary: #a0aec0;
+            --text-white: #ffffff;
+            --border: #4a5568;
+            --border-focus: #63b3ed;
+            --shadow: rgba(0,0,0,0.3);
+            --modal-overlay: rgba(0, 0, 0, 0.7);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-body);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--bg-container);
+            border-radius: 14px;
+            box-shadow: 0 8px 24px var(--shadow);
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-header);
+            color: var(--text-white);
+            font-size: 2em;
+            letter-spacing: 0.5px;
+        }
+
+        .date-box {
+            text-align: center;
+            padding: 20px;
+            background: var(--bg-date-box);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .date-box label {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .date-box input {
+            padding: 10px 14px;
+            border: 2px solid var(--border-focus);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: var(--bg-container);
+            color: var(--text-primary);
+        }
+
+        .date-box input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 6px rgba(79,195,247,0.4);
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 20px;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px var(--shadow);
+        }
+
+        .btn-blue { background: linear-gradient(135deg, #4fc3f7, #29b6f6); color: var(--text-white); }
+        .btn-green { background: linear-gradient(135deg, #66bb6a, #43a047); color: var(--text-white); }
+        .btn-orange { background: linear-gradient(135deg, #ffa726, #fb8c00); color: var(--text-white); }
+        .btn-purple { background: linear-gradient(135deg, #ab47bc, #8e24aa); color: var(--text-white); }
+        .btn-red { background: linear-gradient(135deg, #ef5350, #e53935); color: var(--text-white); }
+        .btn-theme { background: linear-gradient(135deg, #9c88ff, #6c5ce7); color: var(--text-white); }
+
+        .table-container {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-table);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px var(--shadow);
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 12px;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        th:last-child, td:last-child {
+            min-width: 140px;
+        }
+
+        th {
+            background: var(--bg-th);
+            color: var(--text-white);
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        tbody tr:nth-child(even) {
+            background: var(--bg-even-row);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-hover-row);
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            text-align: center;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: var(--bg-container);
+            color: var(--text-primary);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 4px rgba(79,195,247,0.3);
+        }
+
+        input[readonly] {
+            background: var(--bg-even-row);
+            font-weight: bold;
+            cursor: not-allowed;
+            color: var(--text-secondary);
+        }
+
+        .delete-btn {
+            background: #ef5350;
+            color: var(--text-white);
+            border: none;
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #e53935;
+        }
+
+        .check-btn {
+            background: #4caf50;
+            color: var(--text-white);
+            border: none;
+            border-radius: 6px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px var(--shadow);
+            margin-right: 5px;
+        }
+
+        .check-btn:hover {
+            background: #45a049;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px var(--shadow);
+        }
+
+        #rekap {
+            background: var(--bg-rekap);
+            padding: 20px;
+            margin: 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 8px var(--shadow);
+            transition: background 0.3s ease;
+        }
+
+        #rekap h3 {
+            margin-top: 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: var(--bg-modal);
+            border-radius: 14px;
+            box-shadow: 0 8px 32px var(--shadow);
+            max-width: 420px;
+            width: 90%;
+            animation: slideUp 0.35s ease-out;
+            transition: background 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 18px;
+            background: var(--bg-modal-header);
+            color: var(--text-white);
+            border-radius: 14px 14px 0 0;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+        }
+
+        .modal-body {
+            padding: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        #loginBox {
+            text-align: center;
+            padding: 40px;
+            background: var(--bg-container);
+            border-radius: 14px;
+            box-shadow: 0 8px 24px var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        #loginBox label {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        #loginBox input {
+            padding: 12px 16px;
+            border: 2px solid var(--border-focus);
+            border-radius: 10px;
+            font-size: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 300px;
+            background: var(--bg-container);
+            color: var(--text-primary);
+            transition: border-color 0.3s ease;
+        }
+
+        #loginBox input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+            box-shadow: 0 0 6px rgba(79,195,247,0.4);
+        }
+
+        #loginBox .btn {
+            padding: 14px 24px;
+            font-size: 16px;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1><ion-icon name="stats-chart"></ion-icon> Aplikasi Penghitung Stok Barang</h1>
+
+        <div id="loginBox" class="date-box">
+            <label for="karyawan1">Masukkan Nama Karyawan Shift 1:</label>
+            <input type="text" id="karyawan1" placeholder="Nama Karyawan Shift 1">
+            <input type="hidden" id="karyawan2" value="">
+            <button class="btn btn-blue" onclick="confirmShift1()">Konfirmasi</button>
+        </div>
+
+        <div id="mainContent" style="display:none;">
+            <div class="date-box">
+                <label for="tanggal"><ion-icon name="calendar"></ion-icon> Pilih Tanggal:</label>
+                <input type="date" id="tanggal">
+            </div>
+
+            <div class="saved-dates" id="savedDatesContainer" style="display:none;">
+                <label for="savedDates">Lihat Data Tersimpan:</label>
+                <select id="savedDates" onchange="loadDataByDate(this.value)">
+                    <option value="">-- Pilih Tanggal --</option>
+                </select>
+            </div>
+
+            <div id="currentEmployee" class="date-box" style="background: var(--bg-header); color: var(--text-white);">
+                <span id="employeeDisplay">Karyawan Aktif: Shift 1 - <span id="activeName"></span></span>
+            </div>
+
+        <div class="actions">
+            <button class="btn btn-blue" onclick="tambahBarang()">
+                <ion-icon name="add"></ion-icon> Tambah Barang
+            </button>
+            <button class="btn btn-green" onclick="simpanData()">
+                <ion-icon name="save"></ion-icon> Simpan Data Hari Ini
+            </button>
+            <button class="btn btn-orange" onclick="selesaiShift1()">
+                <ion-icon name="checkmark-circle"></ion-icon> Selesai Shift 1
+            </button>
+            <button class="btn btn-purple" onclick="mulaiHariBaru()">
+                <ion-icon name="refresh"></ion-icon> Mulai Hari Baru
+            </button>
+            <button class="btn btn-red" onclick="exportToCSV()">
+                <ion-icon name="download"></ion-icon> Export CSV
+            </button>
+            <select id="themeSelector" class="btn btn-theme" onchange="changeTheme(this.value)">
+                <option value="system">Sistem</option>
+                <option value="light">Terang</option>
+                <option value="dark">Gelap</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table id="stokTable">
+                <thead>
+                    <tr>
+                        <th>Nama Barang</th>
+                        <th>Satuan</th>
+                        <th>Stok Awal</th>
+                        <th>Tambahan Gudang</th>
+                        <th>Sisa Shift 1</th>
+                        <th>Sisa Shift 2 (Akhir)</th>
+                        <th>Terjual Shift 1</th>
+                        <th>Terjual Shift 2</th>
+                        <th>Total Penjualan</th>
+                        <th>Keterangan</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="rekap">
+            <h3><ion-icon name="bar-chart"></ion-icon> Rekap Penjualan</h3>
+            <p id="rekapText">Belum ada data.</p>
+        </div>
+        </div>
+    </div>
+
+    <!-- Modal Dialog -->
+    <div id="modal-overlay" class="modal-overlay" style="display:none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Alert</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-ok" class="btn btn-blue">OK</button>
+                <button id="modal-cancel" class="btn btn-red" style="display:none;">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentShift = 1; // Track current shift: 1 or 2
+
+        // Modal dialog functions
+        function showAlert(message) {
+            return new Promise((resolve) => {
+                document.getElementById('modal-title').textContent = 'Alert';
+                document.getElementById('modal-message').textContent = message;
+                document.getElementById('modal-cancel').style.display = 'none';
+                document.getElementById('modal-overlay').style.display = 'flex';
+
+                const okButton = document.getElementById('modal-ok');
+                const overlay = document.getElementById('modal-overlay');
+
+                const closeModal = () => {
+                    overlay.style.display = 'none';
+                    resolve();
+                };
+
+                okButton.onclick = closeModal;
+
+                // Add keyboard support
+                const handleKeydown = (e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        closeModal();
+                    }
+                };
+
+                overlay.addEventListener('keydown', handleKeydown);
+                okButton.focus(); // Focus the OK button for accessibility
+            });
+        }
+
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                document.getElementById('modal-title').textContent = 'Konfirmasi';
+                document.getElementById('modal-message').textContent = message;
+                document.getElementById('modal-cancel').style.display = 'inline-block';
+                document.getElementById('modal-overlay').style.display = 'flex';
+
+                const okButton = document.getElementById('modal-ok');
+                const cancelButton = document.getElementById('modal-cancel');
+                const overlay = document.getElementById('modal-overlay');
+
+                const closeModal = (result) => {
+                    overlay.style.display = 'none';
+                    resolve(result);
+                };
+
+                okButton.onclick = () => closeModal(true);
+                cancelButton.onclick = () => closeModal(false);
+
+                // Add keyboard support
+                const handleKeydown = (e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.preventDefault();
+                        closeModal(true);
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeModal(false);
+                    }
+                };
+
+                overlay.addEventListener('keydown', handleKeydown);
+                okButton.focus(); // Focus the OK button for accessibility
+            });
+        }
+
+        // Set default tanggal hari ini and load saved dates
+        window.onload = function () {
+            // Show login box initially
+            document.getElementById('loginBox').style.display = 'block';
+            document.getElementById('mainContent').style.display = 'none';
+
+            // Load saved theme or detect system preference
+            let savedTheme = localStorage.getItem('theme') || 'system';
+            let actualTheme;
+            if (savedTheme === 'system') {
+                if (window.matchMedia) {
+                    actualTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+                    // Listen for changes in system theme and update accordingly
+                    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                        if (localStorage.getItem('theme') === 'system') {
+                            const newTheme = e.matches ? 'dark' : 'light';
+                            document.documentElement.setAttribute('data-theme', newTheme);
+                        }
+                    });
+                } else {
+                    actualTheme = 'light';
+                }
+            } else {
+                actualTheme = savedTheme;
+            }
+            document.documentElement.setAttribute('data-theme', actualTheme);
+            updateThemeSelector(savedTheme);
+        }
+
+        // Warn on page refresh if data not saved
+        window.onbeforeunload = function() {
+            let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
+            if (rows.length > 0) {
+                return "Data belum disimpan. Yakin ingin meninggalkan halaman?";
+            }
+        };
+
+        function confirmShift1() {
+            const name = document.getElementById('karyawan1').value.trim();
+            if (!name) {
+                showAlert('Masukkan nama karyawan Shift 1 terlebih dahulu.');
+                return;
+            }
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+
+            currentShift = 1;
+
+            let today = new Date().toISOString().split("T")[0];
+            document.getElementById("tanggal").value = today;
+
+            loadSavedDates();
+            loadDataByDate(today);
+
+            updateActiveEmployee(1, name);
+        }
+
+        function changeTheme(selectedTheme) {
+            localStorage.setItem('theme', selectedTheme);
+            let actualTheme;
+            if (selectedTheme === 'system') {
+                actualTheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            } else {
+                actualTheme = selectedTheme;
+            }
+            document.documentElement.setAttribute('data-theme', actualTheme);
+            updateThemeSelector(selectedTheme);
+        }
+
+        function updateThemeSelector(theme) {
+            const selector = document.getElementById('themeSelector');
+            selector.value = theme;
+        }
+
+        function updateActiveEmployee(shift, name) {
+            const display = document.getElementById('employeeDisplay');
+            display.innerHTML = `Karyawan Aktif: Shift ${shift} - <span id="activeName">${name}</span>`;
+        }
+
+        async function selesaiShift1() {
+            const karyawan2 = document.getElementById("karyawan2").value.trim();
+            if (karyawan2) {
+                await showAlert("Shift 1 sudah selesai. Karyawan Shift 2: " + karyawan2);
+                currentShift = 2;
+                updateActiveEmployee(2, karyawan2);
+                updateTableReadOnly();
+                return;
+            }
+
+            // Show modal to input Shift 2 name
+            const name = await showPrompt("Masukkan nama karyawan Shift 2:");
+            if (name && name.trim()) {
+                document.getElementById("karyawan2").value = name.trim();
+                await showAlert("Shift 1 selesai. Selamat datang, " + name.trim() + " untuk Shift 2!");
+                currentShift = 2;
+                updateActiveEmployee(2, name.trim());
+                updateTableReadOnly();
+            }
+        }
+
+        function showPrompt(message) {
+            return new Promise((resolve) => {
+                document.getElementById('modal-title').textContent = 'Input';
+                document.getElementById('modal-message').innerHTML = message + '<br><input type="text" id="prompt-input" style="width:100%; margin-top:10px; padding:8px;">';
+                document.getElementById('modal-cancel').style.display = 'inline-block';
+                document.getElementById('modal-overlay').style.display = 'flex';
+
+                const okButton = document.getElementById('modal-ok');
+                const cancelButton = document.getElementById('modal-cancel');
+                const overlay = document.getElementById('modal-overlay');
+                const input = document.getElementById('prompt-input');
+
+                const closeModal = (result) => {
+                    overlay.style.display = 'none';
+                    document.getElementById('modal-message').innerHTML = '';
+                    resolve(result);
+                };
+
+                okButton.onclick = () => closeModal(input.value);
+                cancelButton.onclick = () => closeModal(null);
+
+                // Add keyboard support
+                const handleKeydown = (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        closeModal(input.value);
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        closeModal(null);
+                    }
+                };
+
+                overlay.addEventListener('keydown', handleKeydown);
+                input.focus();
+            });
+        }
+
+        // Load all saved dates from localStorage keys
+        function loadSavedDates() {
+            let savedDates = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith("stokData_")) {
+                    let date = key.substring(9);
+                    savedDates.push(date);
+                }
+            }
+            savedDates.sort();
+
+            let select = document.getElementById("savedDates");
+            select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
+            if (savedDates.length > 0) {
+                document.getElementById("savedDatesContainer").style.display = "block";
+                savedDates.forEach(date => {
+                    let option = document.createElement("option");
+                    option.value = date;
+                    option.textContent = date;
+                    select.appendChild(option);
+                });
+            } else {
+                document.getElementById("savedDatesContainer").style.display = "none";
+            }
+        }
+
+        // Load data for a specific date
+        async function loadDataByDate(date) {
+            if (!date) {
+                clearTable();
+                return;
+            }
+            let key = "stokData_" + date;
+            let data = localStorage.getItem(key);
+            if (data) {
+                data = JSON.parse(data);
+                clearTable();
+                muatData(data.items);
+                document.getElementById("tanggal").value = date;
+                document.getElementById("karyawan1").value = data.karyawan1 || "";
+                document.getElementById("karyawan2").value = data.karyawan2 || "";
+                // Update active employee display and shift
+                if (data.karyawan2) {
+                    currentShift = 2;
+                    updateActiveEmployee(2, data.karyawan2);
+                } else if (data.karyawan1) {
+                    currentShift = 1;
+                    updateActiveEmployee(1, data.karyawan1);
+                }
+                updateTableReadOnly();
+            } else {
+                clearTable();
+                await showAlert("Tidak ada data untuk tanggal " + date);
+            }
+        }
+
+        // Clear table rows
+        function clearTable() {
+            document.getElementById("stokTable").getElementsByTagName("tbody")[0].innerHTML = "";
+            document.getElementById("rekapText").innerHTML = "Belum ada data.";
+        }
+
+        function tambahBarang(barang = {}) {
+            let table = document.getElementById("stokTable").getElementsByTagName("tbody")[0];
+            let row = table.insertRow();
+
+            row.innerHTML = `
+        <td><input type="text" value="${barang.nama || ""}" placeholder="Nama Barang" ${currentShift !== 1 ? 'readonly' : ''}></td>
+        <td><input type="text" value="${barang.satuan || ""}" placeholder="Satuan" ${currentShift !== 1 ? 'readonly' : ''}></td>
+        <td><input type="number" value="${barang.stokAwal || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 1 ? 'readonly' : ''}></td>
+        <td><input type="number" value="${barang.gudang || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 1 ? 'readonly' : ''}></td>
+        <td><input type="number" value="${barang.sisa1 || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 1 ? 'readonly' : ''}></td>
+        <td><input type="number" value="${barang.sisa2 || 0}" min="0" oninput="hitungSemua()" ${currentShift !== 2 ? 'readonly' : ''}></td>
+        <td><input type="text" value="${barang.jual1 || 0}" readonly></td>
+        <td><input type="text" value="${barang.jual2 || 0}" readonly></td>
+        <td><input type="text" value="${barang.total || 0}" readonly></td>
+        <td><input type="text" value="${barang.ket || ""}" placeholder="Keterangan"></td>
+        <td>
+            <button class="check-btn" onclick="simpanBarang(this)" title="Simpan Barang"><ion-icon name="checkmark"></ion-icon></button>
+            <button class="delete-btn" onclick="hapusBarang(this)" ${currentShift !== 1 ? 'disabled' : ''}><ion-icon name="trash"></ion-icon></button>
+        </td>
+      `;
+
+            hitungSemua();
+        }
+
+        function updateTableReadOnly() {
+            let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
+            for (let i = 0; i < rows.length; i++) {
+                rows[i].cells[0].children[0].readOnly = currentShift !== 1; // nama
+                rows[i].cells[1].children[0].readOnly = currentShift !== 1; // satuan
+                rows[i].cells[2].children[0].readOnly = currentShift !== 1; // stokAwal
+                rows[i].cells[3].children[0].readOnly = currentShift !== 1; // gudang
+                rows[i].cells[4].children[0].readOnly = currentShift !== 1; // sisa1
+                rows[i].cells[5].children[0].readOnly = currentShift !== 2; // sisa2
+                rows[i].cells[10].children[0].disabled = currentShift !== 1; // delete button
+            }
+        }
+
+        function hitungSemua() {
+            let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
+            let totalShift1 = 0, totalShift2 = 0, totalPenjualan = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                let stokAwal = parseInt(rows[i].cells[2].children[0].value) || 0;
+                let gudang = parseInt(rows[i].cells[3].children[0].value) || 0;
+                let sisa1 = parseInt(rows[i].cells[4].children[0].value) || 0;
+                let sisa2 = parseInt(rows[i].cells[5].children[0].value) || 0;
+
+                let totalStok = stokAwal + gudang;
+                let jual1 = Math.max(0, totalStok - sisa1);
+                let jual2 = Math.max(0, sisa1 - sisa2);
+                let total = jual1 + jual2;
+
+                rows[i].cells[6].children[0].value = jual1;
+                rows[i].cells[7].children[0].value = jual2;
+                rows[i].cells[8].children[0].value = total;
+
+                totalShift1 += jual1;
+                totalShift2 += jual2;
+                totalPenjualan += total;
+            }
+
+            let karyawan1 = document.getElementById("karyawan1").value || "Tidak ada";
+            let karyawan2 = document.getElementById("karyawan2").value || "Tidak ada";
+            document.getElementById("rekapText").innerHTML = `
+        <ion-icon name="person"></ion-icon> Karyawan Shift 1: <b>${karyawan1}</b><br>
+        <ion-icon name="time"></ion-icon> Terjual Shift 1: <b>${totalShift1}</b><br>
+        <ion-icon name="person"></ion-icon> Karyawan Shift 2: <b>${karyawan2}</b><br>
+        <ion-icon name="time"></ion-icon> Terjual Shift 2: <b>${totalShift2}</b><br>
+        <ion-icon name="basket"></ion-icon> Total Penjualan: <b>${totalPenjualan}</b>
+      `;
+        }
+
+        async function hapusBarang(btn) {
+            if (await showConfirm("Apakah Anda yakin ingin menghapus barang ini?")) {
+                let row = btn.parentNode.parentNode;
+                row.parentNode.removeChild(row);
+                hitungSemua();
+            }
+        }
+
+        async function simpanData() {
+            if (!(await showConfirm("Apakah Anda yakin ingin menyimpan data hari ini? Data sebelumnya akan ditimpa."))) return;
+
+            let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
+            if (rows.length === 0) {
+                await showAlert("Tidak ada data untuk disimpan.");
+                return;
+            }
+
+            // Confirm Shift 2 employee name before saving
+            const karyawan2 = document.getElementById("karyawan2").value.trim();
+            if (!karyawan2) {
+                await showAlert("Masukkan nama karyawan Shift 2 terlebih dahulu sebelum menyimpan data.");
+                return;
+            }
+
+            let data = {
+                tanggal: document.getElementById("tanggal").value,
+                karyawan1: document.getElementById("karyawan1").value,
+                karyawan2: karyawan2,
+                items: []
+            };
+
+            for (let i = 0; i < rows.length; i++) {
+                data.items.push({
+                    nama: rows[i].cells[0].children[0].value,
+                    satuan: rows[i].cells[1].children[0].value,
+                    stokAwal: rows[i].cells[2].children[0].value,
+                    gudang: rows[i].cells[3].children[0].value,
+                    sisa1: rows[i].cells[4].children[0].value,
+                    sisa2: rows[i].cells[5].children[0].value,
+                    jual1: rows[i].cells[6].children[0].value,
+                    jual2: rows[i].cells[7].children[0].value,
+                    total: rows[i].cells[8].children[0].value,
+                    ket: rows[i].cells[9].children[0].value
+                });
+            }
+            localStorage.setItem("stokData_" + data.tanggal, JSON.stringify(data));
+            await showAlert("✅ Data tanggal " + data.tanggal + " berhasil disimpan!");
+        }
+
+        function simpanBarang(btn) {
+            let row = btn.parentNode.parentNode;
+            let inputs = row.querySelectorAll("input");
+            // Trigger recalculation
+            hitungSemua();
+            showAlert("✅ Barang berhasil disimpan!");
+        }
+
+        async function mulaiHariBaru() {
+            let lastDateKey = null;
+            // Find the latest date key in localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.startsWith("stokData_")) {
+                    if (!lastDateKey || key > lastDateKey) {
+                        lastDateKey = key;
+                    }
+                }
+            }
+            if (!lastDateKey) {
+                await showAlert("Belum ada data kemarin.");
+                return;
+            }
+
+            if (!(await showConfirm("Apakah Anda yakin ingin memulai hari baru? Data hari ini akan disimpan dan stok awal akan diperbarui."))) return;
+
+            let data = JSON.parse(localStorage.getItem(lastDateKey));
+            let today = new Date(data.tanggal);
+            today.setDate(today.getDate() + 1);
+            let besok = today.toISOString().split("T")[0];
+
+            let dataBaru = data.items.map(item => ({
+                nama: item.nama,
+                satuan: item.satuan,
+                stokAwal: item.sisa2,  // stok akhir kemarin jadi stok awal
+                gudang: 0,
+                sisa1: 0,
+                sisa2: 0,
+                jual1: 0,
+                jual2: 0,
+                total: 0,
+                ket: ""                // kosongkan keterangan
+            }));
+
+            document.getElementById("stokTable").getElementsByTagName("tbody")[0].innerHTML = "";
+            muatData(dataBaru);
+            document.getElementById("tanggal").value = besok;
+            document.getElementById("karyawan1").value = "";
+            document.getElementById("karyawan2").value = "";
+
+            currentShift = 1;
+            // Reset to shift 1 for new day
+            updateActiveEmployee(1, "");
+            updateTableReadOnly();
+
+            await showAlert("🔄 Hari baru dimulai untuk tanggal " + besok);
+        }
+
+
+        function muatData(items) {
+            for (let i = 0; i < items.length; i++) {
+                tambahBarang(items[i]);
+            }
+            hitungSemua();
+        }
+
+        async function exportToCSV() {
+            let rows = document.getElementById("stokTable").getElementsByTagName("tbody")[0].rows;
+            if (rows.length === 0) {
+                await showAlert("Tidak ada data untuk diekspor.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Nama Barang,Satuan,Stok Awal,Tambahan Gudang,Sisa Shift 1,Sisa Shift 2 (Akhir),Terjual Shift 1,Terjual Shift 2,Total Penjualan,Keterangan\n";
+
+            for (let i = 0; i < rows.length; i++) {
+                let row = [];
+                for (let j = 0; j < 10; j++) { // 10 columns without delete button
+                    let val = rows[i].cells[j].children[0].value;
+                    // Escape quotes and commas
+                    val = val.replace(/"/g, '""');
+                    if (val.indexOf(",") >= 0 || val.indexOf('"') >= 0) {
+                        val = `"${val}"`;
+                    }
+                    row.push(val);
+                }
+                csvContent += row.join(",") + "\n";
+            }
+
+            let encodedUri = encodeURI(csvContent);
+            let link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            let tanggal = document.getElementById("tanggal").value || "data";
+            link.setAttribute("download", `stok_barang_${tanggal}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+
+</html>
