@@ -871,10 +871,6 @@
             document.getElementById('loginBox').classList.remove('hidden');
             document.getElementById('mainContent').classList.add('hidden');
 
-            // Set tanggal to today by default
-            const today = new Date().toISOString().split("T")[0];
-            document.getElementById("tanggal").value = today;
-
             // Load saved theme or detect system preference
             let savedTheme = localStorage.getItem('theme') || 'system';
             let actualTheme;
@@ -921,8 +917,9 @@
 
             currentShift = 1;
 
-            let today = new Date().toISOString().split("T")[0];
-            document.getElementById("tanggal").value = today;
+            let today = new Date();
+            let localDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            document.getElementById("tanggal").value = localDate;
 
             loadSavedDates();
             loadDataByDate(today);
@@ -1276,7 +1273,8 @@
             if (!(await showConfirm("Apakah Anda yakin ingin memulai hari baru? Data hari ini akan disimpan dan stok awal akan diperbarui."))) return;
 
             let data = JSON.parse(localStorage.getItem(lastDateKey));
-            let besok = new Date().toISOString().split("T")[0];
+            let today = new Date();
+            let besok = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 
             let dataBaru = data.items.map(item => ({
                 nama: item.nama,
@@ -1508,7 +1506,7 @@
         }
 
         // Hapus semua data di localStorage
-        // localStorage.clear();
+        localStorage.clear();
 
     </script>
 </body>
