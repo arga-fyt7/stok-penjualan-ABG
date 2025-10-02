@@ -662,8 +662,8 @@
             </section>
 
             <section class="date-box" role="region" aria-labelledby="dateLabel">
-                <label id="dateLabel"><ion-icon name="calendar" aria-hidden="true"></ion-icon> Tanggal Hari Ini:</label>
-                <span id="tanggal" aria-describedby="dateLabel"></span>
+                <label id="dateLabel"><ion-icon name="calendar" aria-hidden="true"></ion-icon> Tanggal:</label>
+                <input type="date" id="tanggal" aria-describedby="dateLabel" onchange="onDateChange()">
             </section>
 
             <section class="saved-dates hidden" id="savedDatesContainer" role="region"
@@ -873,7 +873,7 @@
 
             // Set tanggal to today by default
             const today = new Date().toISOString().split("T")[0];
-            document.getElementById("tanggal").textContent = today;
+            document.getElementById("tanggal").value = today;
 
             // Load saved theme or detect system preference
             let savedTheme = localStorage.getItem('theme') || 'system';
@@ -922,7 +922,7 @@
             currentShift = 1;
 
             let today = new Date().toISOString().split("T")[0];
-            document.getElementById("tanggal").textContent = today;
+            document.getElementById("tanggal").value = today;
 
             loadSavedDates();
             loadDataByDate(today);
@@ -1080,7 +1080,7 @@
                 data = JSON.parse(data);
                 clearTable();
                 muatData(data.items);
-                // Keep tanggal as today, since it's automatic
+                document.getElementById("tanggal").value = date;
                 document.getElementById("karyawan1").value = data.karyawan1 || "";
                 document.getElementById("karyawan2").value = data.karyawan2 || "";
                 // Reset UI elements
@@ -1224,7 +1224,7 @@
             }
 
             let data = {
-                tanggal: document.getElementById("tanggal").textContent,
+                tanggal: document.getElementById("tanggal").value,
                 karyawan1: document.getElementById("karyawan1").value,
                 karyawan2: karyawan2,
                 items: []
@@ -1294,7 +1294,7 @@
 
             document.getElementById("stokTable").getElementsByTagName("tbody")[0].innerHTML = "";
             muatData(dataBaru);
-            document.getElementById("tanggal").textContent = besok;
+            document.getElementById("tanggal").value = besok;
             document.getElementById("karyawan2").value = "";
 
             currentShift = 1;
@@ -1346,7 +1346,7 @@
             let encodedUri = encodeURI(csvContent);
             let link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            let tanggal = document.getElementById("tanggal").textContent || "data";
+            let tanggal = document.getElementById("tanggal").value || "data";
             link.setAttribute("download", `stok_barang_${tanggal}.csv`);
             document.body.appendChild(link);
             link.click();
@@ -1502,8 +1502,13 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        function onDateChange() {
+            const newDate = document.getElementById("tanggal").value;
+            loadDataByDate(newDate);
+        }
+
         // Hapus semua data di localStorage
-        //localStorage.clear();
+        // localStorage.clear();
 
     </script>
 </body>
